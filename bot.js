@@ -15,7 +15,7 @@ const client = new Client({
 
 client.commands = new Collection()
 
-const processLoader = async () => {
+const controllers = async () => {
   // Refresh session
   await useSession()
 
@@ -26,7 +26,8 @@ const processLoader = async () => {
     const controller = await import(`./controllers/${file}`)
     controller.default(client)
   }
+
+  client.login(process.env.DISCORD_TOKEN)
 }
 
-processLoader()
-client.login(process.env.DISCORD_TOKEN)
+controllers()
