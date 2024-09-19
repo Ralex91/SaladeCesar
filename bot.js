@@ -1,6 +1,7 @@
 import { Client, Collection, GatewayIntentBits } from "discord.js"
 import "dotenv/config"
 import fs from "fs"
+import { useSession } from "./utils/session.js"
 
 const client = new Client({
   intents: [
@@ -14,12 +15,18 @@ const client = new Client({
 
 client.commands = new Collection()
 
-// Load controllers
-const controllerFiles = fs.readdirSync("./controllers")
+const processLoader = async () => {
+  // Refresh session
+  await useSession()
 
-for (const file of controllerFiles) {
-  const controller = await import(`./controllers/${file}`)
-  controller.default(client)
+  // Load controllers
+  const controllerFiles = fs.readdirSync("./controllers")
+
+  for (const file of controllerFiles) {
+    const controller = await import(`./controllers/${file}`)
+    controller.default(client)
+  }
 }
 
+processLoader()
 client.login(process.env.DISCORD_TOKEN)

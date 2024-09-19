@@ -4,7 +4,7 @@ import puppeteer from "puppeteer"
 import config from "../config.js"
 
 const COOKIE_NAME = "PHPSESSID"
-const SESSION_FILE = "sessid.txt"
+const SESSION_FILE = "./sessid.txt"
 
 export const createSession = async () => {
   const browser = await puppeteer.launch({
@@ -63,11 +63,16 @@ export const checkSession = async (sessid) => {
 }
 
 export const useSession = async () => {
-  const savedSessid = fs.readFileSync(SESSION_FILE, "utf8")
+  let savedSessid = "DISCONNECTED"
+
+  if (fs.existsSync(SESSION_FILE)) {
+    savedSessid = fs.readFileSync(SESSION_FILE, "utf8")
+  }
+
   const isLogged = await checkSession(savedSessid)
   const session = isLogged ? savedSessid : await createSession()
 
-  if (!isLogged) {
+  if (!session) {
     throw new Error("Cesar: Invalid credentials")
   }
 
