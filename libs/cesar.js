@@ -5,15 +5,18 @@ import { useSession } from "../utils/session.js"
 
 const bodyParser = async (path) => {
   const session = await useSession()
-  const res = await ky
-    .get(`${config.baseUrl}${path ?? ""}`, {
-      headers: {
-        Cookie: `PHPSESSID=${session}`,
-      },
-    })
-    .text()
+  const res = await ky.get(`${config.baseUrl}${path ?? ""}`, {
+    headers: {
+      Cookie: `PHPSESSID=${session}`,
+    },
+  })
 
-  const root = parse(res)
+  if (!res.ok) {
+    throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
+  }
+
+  const rawBody = await res.text()
+  const root = parse(rawBody)
 
   return root
 }

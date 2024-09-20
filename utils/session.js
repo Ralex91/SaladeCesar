@@ -52,6 +52,10 @@ export const checkSession = async (sessid) => {
     },
   })
 
+  if (!res.ok) {
+    throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
+  }
+
   if (
     res.url === `${config.baseUrl}/connexion` ||
     res.url === `${config.baseUrl}/login`
