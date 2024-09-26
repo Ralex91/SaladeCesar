@@ -15,7 +15,6 @@ const attendanceCheck = async (client) => {
   }
 
   client.on("ready", async () => {
-    checker()
     scheduleJob("0 9 * * *", () => checker())
     scheduleJob("30 13 * * *", () => checker())
   })
@@ -23,9 +22,14 @@ const attendanceCheck = async (client) => {
   const task = async (job) => {
     try {
       const lessons = await getLessonsOfDay()
-
       const channel = client.channels.cache.get(config.channelAttendance)
-      const attendance = lessons.find((lesson) => lesson.signed === false)
+      const now = new Date().getTime()
+      const attendance = lessons.find(
+        (lesson) =>
+          lesson.attendanceSheet != null &&
+          lesson.startDate <= now &&
+          lesson.endDate > now
+      )
 
       if (!attendance) {
         console.log(`No attendance: ${formatDate(new Date())}`)
