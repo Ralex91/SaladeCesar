@@ -1,22 +1,21 @@
-import ky from "ky"
+import got from "got"
 import { parse } from "node-html-parser"
 import config from "../config.js"
 import { useSession } from "../utils/session.js"
 
 const bodyParser = async (path) => {
   const session = await useSession()
-  const res = await ky.get(`${config.baseUrl}${path ?? ""}`, {
+  const { body, ok } = await got.get(`${config.baseUrl}${path ?? ""}`, {
     headers: {
       Cookie: `PHPSESSID=${session}`,
     },
   })
 
-  if (!res.ok) {
+  if (!ok) {
     throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
   }
 
-  const rawBody = await res.text()
-  const root = parse(rawBody)
+  const root = parse(body)
 
   return root
 }
@@ -30,7 +29,7 @@ const calandarJson = async (path) => {
   return JSON.parse(json)
 }
 
-export const getCalandar = async () => await calandarJson("emploi-du-temps")
+export const getCalandar = async () => await calandarJson("/emploi-du-temps")
 
 export const getLessonsOfDay = async () => {
   const dayCalendar = await calandarJson()

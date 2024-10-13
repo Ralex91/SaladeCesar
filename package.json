@@ -13,9 +13,9 @@
   "dependencies": {
     "discord.js": "^14.16.2",
     "dotenv": "^16.4.5",
-    "ky": "^1.7.2",
+    "got": "^14.4.3",
     "node-html-parser": "^6.1.13",
     "node-schedule": "^2.1.1",
-    "puppeteer": "^23.3.1"
+    "tough-cookie": "^5.0.0"
   }
 }

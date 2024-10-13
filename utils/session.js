@@ -1,56 +1,66 @@
 import fs from "fs"
-import ky from "ky"
-import puppeteer from "puppeteer"
+import got from "got"
+import { parse } from "node-html-parser"
+import { CookieJar } from "tough-cookie"
 import config from "../config.js"
 
 const COOKIE_NAME = "PHPSESSID"
 const SESSION_FILE = "./sessid.txt"
 
-export const createSession = async () => {
-  const browser = await puppeteer.launch({
-    headless: true,
-  })
+const cookieJar = new CookieJar()
+const client = got.extend({
+  prefixUrl: config.baseUrl,
+  cookieJar,
+  retry: {
+    limit: 0,
+  },
+  maxRedirects: 1,
+})
 
-  const [page] = await browser.pages()
-  page.setDefaultNavigationTimeout(0)
+const createSession = async () => {
+  const { body: bodyCsrf } = await client.get("connexion")
 
-  await page.setRequestInterception(true)
+  const csrf = parse(bodyCsrf)
+    .querySelector("input[name='_csrf_token']")
+    .getAttribute("value")
 
-  page.on("request", (req) => {
-    if (!["document", "xhr", "fetch", "script"].includes(req.resourceType())) {
-      return req.abort()
+  const creds = new URLSearchParams()
+  creds.set("_username", process.env.CESAR_USERNAME)
+  creds.set("_password", process.env.CESAR_PASSWORD)
+  creds.set("_csrf_token", csrf)
+  creds.set("_referer", "")
+
+  try {
+    await client.post("connexion", {
+      body: creds.toString(),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        referrer: `${config.baseUrl}/connexion`,
+      },
+    })
+
+    const { value: sessid } = cookieJar
+      .getCookiesSync(config.baseUrl)
+      .find((cookie) => cookie.key === COOKIE_NAME)
+
+    fs.writeFileSync(SESSION_FILE, sessid, "utf8")
+
+    return sessid
+  } catch (error) {
+    if (error.name === "MaxRedirectsError") {
+      throw Error("Cesar: Invalid credentials")
     }
-    req.continue()
-  })
 
-  await page.goto(`${config.baseUrl}/connexion`, {
-    waitUntil: "networkidle0",
-  })
-
-  await page.locator("#username").fill(process.env.CESAR_USERNAME)
-  await page.locator("#password").fill(process.env.CESAR_PASSWORD)
-
-  await page.locator("button").click()
-
-  await page.waitForNavigation()
-
-  const sessid = await page.cookies().then((cookies) => {
-    return cookies.find((cookie) => cookie.name === COOKIE_NAME).value
-  })
-
-  await browser.close()
-
-  fs.writeFileSync(SESSION_FILE, sessid, "utf8")
-
-  return sessid
+    throw Error(`Cesar error: failed to login, ${error.message}`)
+  }
 }
 
 export const checkSession = async (sessid) => {
-  const res = await ky.get(config.baseUrl, {
-    headers: {
-      Cookie: `${COOKIE_NAME}=${sessid}`,
-    },
+  cookieJar.setCookieSync(`${COOKIE_NAME}=${sessid}`, config.baseUrl, {
+    httpOnly: true,
   })
+
+  const res = await client.get()
 
   if (!res.ok) {
     throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
@@ -67,7 +77,7 @@ export const checkSession = async (sessid) => {
 }
 
 export const useSession = async () => {
-  let savedSessid = "DISCONNECTED"
+  let savedSessid = null
 
   if (fs.existsSync(SESSION_FILE)) {
     savedSessid = fs.readFileSync(SESSION_FILE, "utf8")
@@ -75,10 +85,6 @@ export const useSession = async () => {
 
   const isLogged = await checkSession(savedSessid)
   const session = isLogged ? savedSessid : await createSession()
-
-  if (!session) {
-    throw new Error("Cesar: Invalid credentials")
-  }
 
   return session
 }
