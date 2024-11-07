@@ -60,7 +60,7 @@ const lessonsOfDay = async (client) => {
           )
 
         message.edit({
-          content: `>>> Il n'y a pas de pelle as esquiver aujourd'hui 🤗`,
+          content: `>>> Il n'y a pas de pelle a esquivé aujourd'hui 🤗`,
           embeds: [noLessonEmbed],
         })
 
