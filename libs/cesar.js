@@ -7,6 +7,7 @@ import {
   SELECTOR_COURSE_NAME,
   SELECTOR_COURSES,
   SELECTOR_GRADE,
+  SELECTOR_GRADE_COMMENT,
   SELECTOR_GRADE_ROW,
   SELECTOR_GRADE_ROW_COEF,
   SELECTOR_GRADE_ROW_DATE,
@@ -32,7 +33,13 @@ const bodyParser = async (path) => {
   return root
 }
 
-const extractText = (element) => decode(element.innerText.trim())
+const extractText = (element) => {
+  if (!element || !element.innerText) {
+    return null
+  }
+
+  return decode(element.innerText.trim())
+}
 
 const calandarJson = async (path) => {
   const body = await bodyParser(path)
@@ -72,7 +79,7 @@ export const getGrades = async () => {
         /\s+/g,
         "/"
       ),
-      comment: null,
+      comment: extractText(grade.querySelector(SELECTOR_GRADE_COMMENT)),
       date: extractText(
         grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_DATE]
       ),
