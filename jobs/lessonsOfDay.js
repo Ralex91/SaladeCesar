@@ -23,7 +23,7 @@ const lessonsOfDay = async (client) => {
           .setTitle(`**📚   \u200B${lesson.schoolSubject.name}**`)
           .addFields(
             {
-              name: "👨‍🏫 ┃ Profeseur",
+              name: "👨‍🏫 ┃ Professeur",
               value:
                 "`" +
                 lesson.teachers

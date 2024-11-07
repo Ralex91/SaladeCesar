@@ -17,6 +17,9 @@ importers:
       got:
         specifier: ^14.4.3
         version: 14.4.3
+      html-entities:
+        specifier: ^2.5.2
+        version: 2.5.2
       node-html-parser:
         specifier: ^6.1.13
         version: 6.1.13
@@ -172,6 +175,9 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
+
+  html-entities@2.5.2:
+    resolution: {integrity: sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==}
 
   http-cache-semantics@4.1.1:
     resolution: {integrity: sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==}
@@ -470,6 +476,8 @@ snapshots:
       type-fest: 4.26.1
 
   he@1.2.0: {}
+
+  html-entities@2.5.2: {}
 
   http-cache-semantics@4.1.1: {}
 
