@@ -1,7 +1,7 @@
-export const SELECTOR_COURSES = ".accordion-item"
+export const SELECTOR_COURSES = ".accordion-collapse .accordion-item"
 export const SELECTOR_COURSE_NAME = ".accordion-button .h5"
 export const SELECTOR_COURSE_GRADES = ".card"
-export const SELECTOR_GRADE = "h5"
+export const SELECTOR_GRADE = ".badge.text-bg-primary.fw-normal"
 export const SELECTOR_GRADE_TITLE = ".card-header .h6"
 export const SELECTOR_GRADE_COMMENT = ".card-text"
 export const SELECTOR_GRADE_ROW =
