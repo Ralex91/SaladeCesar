@@ -69,7 +69,9 @@ export const getLessonsOfDay = async () => {
 
 export const getGrades = async () => {
   const body = await bodyParser("/mes-notes")
-  const cours = body.querySelectorAll(SELECTOR_COURSES)
+  const cours = body
+    .querySelectorAll(SELECTOR_COURSES)
+    .filter((item) => !item.querySelector(".accordion-button svg"))
 
   const gradesList = cours.map((cour) => ({
     name: extractText(cour.querySelector(SELECTOR_COURSE_NAME)),
