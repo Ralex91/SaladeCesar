@@ -76,7 +76,7 @@ export const getGrades = async () => {
   const gradesList = cours.map((cour) => ({
     name: extractText(cour.querySelector(SELECTOR_COURSE_NAME)),
     grades: cour.querySelectorAll(SELECTOR_COURSE_GRADES).map((grade) => ({
-      title: extractText(cour.querySelector(SELECTOR_GRADE_TITLE)),
+      title: extractText(grade.querySelector(SELECTOR_GRADE_TITLE)),
       grade: extractText(grade.querySelector(SELECTOR_GRADE)).replace(
         /\s+/g,
         "/"
