@@ -2,11 +2,13 @@ import fs from "fs"
 import got from "got"
 import { parse } from "node-html-parser"
 import { CookieJar } from "tough-cookie"
+import UserAgent from "user-agents"
 import config from "../config.js"
 
 const COOKIE_NAME = "PHPSESSID"
 const SESSION_FILE = "./sessid.txt"
 
+const userAgent = new UserAgent({ platform: "Win32" })
 const cookieJar = new CookieJar()
 const client = got.extend({
   prefixUrl: config.baseUrl,
@@ -14,10 +16,14 @@ const client = got.extend({
   retry: {
     limit: 0,
   },
+  headers: {
+    "User-Agent": userAgent().toString(),
+    origin: config.baseUrl,
+  },
   maxRedirects: 1,
 })
 
-const createSession = async () => {
+export const createSession = async () => {
   const { body: bodyCsrf } = await client.get("connexion")
 
   const csrf = parse(bodyCsrf)
