@@ -11,13 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.19.2",
-    "dotenv": "^16.5.0",
-    "got": "^14.4.7",
+    "discord.js": "^14.23.2",
+    "dotenv": "^16.6.1",
+    "formdata-node": "^6.0.3",
+    "got": "^14.6.0",
     "html-entities": "^2.6.0",
     "node-html-parser": "^6.1.13",
     "node-schedule": "^2.1.1",
     "tough-cookie": "^5.1.2",
-    "user-agents": "^1.1.525"
+    "user-agents": "^1.1.669"
   }
 }

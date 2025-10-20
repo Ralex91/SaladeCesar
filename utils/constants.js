@@ -1,3 +1,14 @@
+import config from "../config.js"
+
+export const LOGIN_URLS = [
+  `${config.baseUrl}/connexion`,
+  `${config.baseUrl}/login`,
+]
+export const CVEC_URLS = [
+  `${config.baseUrl}/televersement/cvec`,
+  `${config.baseUrl}/upload/cvec`,
+]
+
 export const SELECTOR_COURSES = ".accordion-collapse .accordion-item"
 export const SELECTOR_COURSE_NAME = ".accordion-button .h5"
 export const SELECTOR_COURSE_GRADES = ".card"

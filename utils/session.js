@@ -1,9 +1,11 @@
+import { FormData } from "formdata-node"
 import fs from "fs"
 import got from "got"
 import { parse } from "node-html-parser"
 import { CookieJar } from "tough-cookie"
 import UserAgent from "user-agents"
 import config from "../config.js"
+import { CVEC_URLS, LOGIN_URLS } from "./constants.js"
 
 const COOKIE_NAME = "PHPSESSID"
 const SESSION_FILE = "./sessid.txt"
@@ -18,10 +20,30 @@ const client = got.extend({
   },
   headers: {
     "User-Agent": userAgent().toString(),
-    origin: config.baseUrl,
+    Origin: config.baseUrl,
   },
-  maxRedirects: 1,
+  maxRedirects: 2,
 })
+
+const bypassCVEC = async () => {
+  const form = new FormData()
+
+  form.set("cvec_file[cvec_file]", {
+    filename: "",
+    contentType: "application/octet-stream",
+  })
+
+  form.set("cvec_file[_token]", "csrf-token")
+  form.set("cvec_file[skip]", "skip")
+
+  await client.post(`upload/cvec`, {
+    headers: {
+      Referrer: `${config.baseUrl}/upload/cvec`,
+    },
+    body: form,
+    followRedirect: false,
+  })
+}
 
 export const createSession = async () => {
   const { body: bodyCsrf } = await client.get("connexion")
@@ -37,7 +59,7 @@ export const createSession = async () => {
   creds.set("_referer", "")
 
   try {
-    await client.post("connexion", {
+    const logged = await client.post("connexion", {
       body: creds.toString(),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -51,8 +73,16 @@ export const createSession = async () => {
 
     fs.writeFileSync(SESSION_FILE, sessid, "utf8")
 
+    if (CVEC_URLS.includes(logged.url)) {
+      await bypassCVEC()
+    }
+
     return sessid
   } catch (error) {
+    if (fs.existsSync(SESSION_FILE)) {
+      fs.unlinkSync(SESSION_FILE)
+    }
+
     if (error.name === "MaxRedirectsError") {
       throw Error("Cesar: Invalid credentials")
     }
@@ -72,10 +102,7 @@ export const checkSession = async (sessid) => {
     throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
   }
 
-  if (
-    res.url === `${config.baseUrl}/connexion` ||
-    res.url === `${config.baseUrl}/login`
-  ) {
+  if (LOGIN_URLS.includes(res.url)) {
     return false
   }
 

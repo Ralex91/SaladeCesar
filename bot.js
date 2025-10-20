@@ -16,10 +16,8 @@ const client = new Client({
 client.commands = new Collection()
 
 const controllers = async () => {
-  // Refresh session
   await useSession()
 
-  // Load controllers
   const controllerFiles = fs.readdirSync("./controllers")
 
   for (const file of controllerFiles) {
