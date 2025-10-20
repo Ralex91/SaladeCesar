@@ -23,6 +23,9 @@ const client = got.extend({
     Origin: config.baseUrl,
   },
   maxRedirects: 2,
+  https: {
+    rejectUnauthorized: false,
+  },
 })
 
 const bypassCVEC = async () => {

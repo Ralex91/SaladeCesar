@@ -22,6 +22,9 @@ const bodyParser = async (path) => {
     headers: {
       Cookie: `PHPSESSID=${session}`,
     },
+    https: {
+      rejectUnauthorized: false,
+    },
   })
 
   if (!ok) {
