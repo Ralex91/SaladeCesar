@@ -4,7 +4,7 @@ import config from "../config.js"
 import { getLessonsOfDay } from "../libs/cesar.js"
 
 const lessonsOfDay = async (client) => {
-  client.on("ready", async () => {
+  client.on("clientReady", async () => {
     const channel = client.channels.cache.get(config.channelLesson)
     await channel.bulkDelete(1, true)
 

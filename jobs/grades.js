@@ -6,7 +6,7 @@ import { findNewGrades, getGrades } from "../libs/cesar.js"
 import { getHexRandomColor } from "../utils/color.js"
 
 const gradresCheck = async (client) => {
-  client.on("ready", async () => {
+  client.on("clientReady", async () => {
     scheduleJob("0 * * * *", () => task())
     task()
   })

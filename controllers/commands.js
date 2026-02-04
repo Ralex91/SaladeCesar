@@ -12,7 +12,7 @@ const commands = async (client) => {
     client.commands.set(command.name, command)
   }
 
-  client.on("ready", async () => {
+  client.on("clientReady", async () => {
     const devGuild = await client.guilds.cache.get(config.guildID)
     devGuild.commands.set(client.commands.map((cmd) => cmd))
   })

@@ -14,7 +14,7 @@ const attendanceCheck = async (client) => {
     cancelJobTimout = setTimeout(() => job.cancel(), 60 * 60 * 1000)
   }
 
-  client.on("ready", async () => {
+  client.on("clientReady", async () => {
     scheduleJob("0 9 * * *", () => checker())
     scheduleJob("30 13 * * *", () => checker())
   })

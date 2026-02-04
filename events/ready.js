@@ -1,7 +1,7 @@
 import { ActivityType } from "discord.js"
 
 const ready = {
-  name: "ready",
+  name: "clientReady",
   once: true,
 
   async execute(client) {

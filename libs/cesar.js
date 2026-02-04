@@ -62,7 +62,7 @@ export const getLessonsOfDay = async () => {
     ...lesson,
     signed: lesson.attendanceSheet
       ? lesson.attendanceSheet.attendanceSheetLines.some(
-          (line) => line.signature !== null
+          (line) => line.signature !== null,
         )
       : null,
   }))
@@ -82,19 +82,21 @@ export const getGrades = async () => {
       title: extractText(grade.querySelector(SELECTOR_GRADE_TITLE)),
       grade: extractText(grade.querySelector(SELECTOR_GRADE)).replace(
         /\s+/g,
-        "/"
+        "/",
       ),
       comment: extractText(grade.querySelector(SELECTOR_GRADE_COMMENT)),
       date: extractText(
-        grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_DATE]
+        grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_DATE],
       ),
       coeficient: parseInt(
         extractText(
-          grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_COEF]
-        )
+          grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_COEF],
+        ),
       ),
       groupAverage: extractText(
-        grade.querySelectorAll(SELECTOR_GRADE_ROW)[SELECTOR_GRADE_ROW_GROUP_AVG]
+        grade.querySelectorAll(SELECTOR_GRADE_ROW)[
+          SELECTOR_GRADE_ROW_GROUP_AVG
+        ],
       ),
     })),
   }))
@@ -106,7 +108,7 @@ export const findNewGrades = (oldGrades, newGrades) =>
   newGrades
     .map((newSubject) => {
       const oldSubject = oldGrades.find(
-        (subject) => subject.name === newSubject.name
+        (subject) => subject.name === newSubject.name,
       )
 
       if (oldSubject) {
@@ -119,8 +121,8 @@ export const findNewGrades = (oldGrades, newGrades) =>
               (oldGrade) =>
                 oldGrade.title === newGrade.title &&
                 oldGrade.grade === newGrade.grade &&
-                oldGrade.date === newGrade.date
-            )
+                oldGrade.date === newGrade.date,
+            ),
         )
 
         if (newEntries.length > 0) {
