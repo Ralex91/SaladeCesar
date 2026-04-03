@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import got from "got"
 import { decode } from "html-entities"
 import { parse } from "node-html-parser"
@@ -136,3 +137,37 @@ export const findNewGrades = (oldGrades, newGrades) =>
       return null
     })
     .filter((diff) => diff !== null)
+
+export const getNextWeekWithLessons = async () => {
+  const calandar = await getCalandar()
+
+  const getLessonsForWeek = (weekStart) => {
+    const monday = weekStart.startOf("day")
+    const friday = monday.add(4, "day").endOf("day")
+
+    return calandar.filter((lesson) => {
+      const date = dayjs(lesson.startDate)
+
+      return (
+        (date.isAfter(monday) || date.isSame(monday)) &&
+        (date.isBefore(friday) || date.isSame(friday))
+      )
+    })
+  }
+
+  const now = dayjs()
+  const limit = now.add(45, "day")
+  let monday = now.day(now.day() === 0 ? -6 : 1)
+
+  while (monday.isBefore(limit)) {
+    const lessons = getLessonsForWeek(monday)
+
+    if (lessons.length > 0) {
+      return { lessons, monday }
+    }
+
+    monday = monday.add(1, "week")
+  }
+
+  return null
+}

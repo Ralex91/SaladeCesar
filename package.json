@@ -11,14 +11,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.23.2",
-    "dotenv": "^16.6.1",
+    "@resvg/resvg-js": "^2.6.2",
+    "dayjs": "^1.11.20",
+    "discord.js": "^14.26.0",
+    "dotenv": "^17.4.0",
     "formdata-node": "^6.0.3",
-    "got": "^14.6.0",
+    "got": "^15.0.0",
     "html-entities": "^2.6.0",
-    "node-html-parser": "^6.1.13",
+    "node-html-parser": "^7.1.0",
     "node-schedule": "^2.1.1",
-    "tough-cookie": "^5.1.2",
-    "user-agents": "^1.1.669"
+    "satori": "^0.26.0",
+    "tough-cookie": "^6.0.1",
+    "user-agents": "^2.1.19"
   }
 }
