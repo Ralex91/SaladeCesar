@@ -30,6 +30,7 @@ export const generateTimetable = async (lessons, monday) => {
   })
 
   const now = dayjs()
+  const tomorrow = now.add(1, "day")
   const currentMonday = now.day(now.day() === 0 ? -6 : 1).startOf("day")
   const isCurrentWeek = monday.isSame(currentMonday, "day")
 
@@ -104,7 +105,7 @@ export const generateTimetable = async (lessons, monday) => {
     props: {
       style: styles.row,
       children: schedule.map((d, i) =>
-        cell(d[slotKey], monday.add(i, "day").isSame(now, "day")),
+        cell(d[slotKey], monday.add(i, "day").isSame(tomorrow, "day")),
       ),
     },
   })
@@ -119,7 +120,7 @@ export const generateTimetable = async (lessons, monday) => {
           props: {
             style: styles.headerRow,
             children: TIMETABLE_DAYS.map((day, i) => {
-              const isToday = monday.add(i, "day").isSame(now, "day")
+              const isToday = monday.add(i, "day").isSame(tomorrow, "day")
 
               return {
                 type: "div",

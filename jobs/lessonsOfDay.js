@@ -14,7 +14,7 @@ import { generateTimetable } from "../utils/timetable/generator.js"
 const buildContent = (weekResult) => {
   const now = dayjs()
   const hasLessons = weekResult.lessons.some((l) =>
-    dayjs(l.startDate).isSame(now, "day"),
+    dayjs(l.startDate).isSame(now.add(1, "day"), "day"),
   )
   const currentMonday = now.day(now.day() === 0 ? -6 : 1).startOf("day")
   const isCurrentWeek = weekResult.monday.isSame(currentMonday, "day")

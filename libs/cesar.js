@@ -156,8 +156,9 @@ export const getNextWeekWithLessons = async () => {
   }
 
   const now = dayjs()
-  const limit = now.add(45, "day")
-  let monday = now.day(now.day() === 0 ? -6 : 1)
+  const tomorrow = now.add(1, "day")
+  const limit = tomorrow.add(45, "day")
+  let monday = tomorrow.day(tomorrow.day() === 0 ? -6 : 1)
 
   while (monday.isBefore(limit)) {
     const lessons = getLessonsForWeek(monday)
