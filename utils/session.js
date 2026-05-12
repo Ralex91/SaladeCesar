@@ -105,7 +105,9 @@ export const checkSession = async (sessid) => {
     throw Error(`Cesar error: ${res.status} : ${res.statusText}`)
   }
 
-  if (LOGIN_URLS.includes(res.url)) {
+  const noParamsUrl = res.url.split("?")[0]
+
+  if (LOGIN_URLS.includes(noParamsUrl)) {
     return false
   }
 
