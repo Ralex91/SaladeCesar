@@ -160,6 +160,10 @@ export const getNextWeekWithLessons = async () => {
   const limit = tomorrow.add(45, "day")
   let monday = tomorrow.day(tomorrow.day() === 0 ? -6 : 1)
 
+  if (tomorrow.day() === 6 || tomorrow.day() === 0) {
+    monday = monday.add(1, "week")
+  }
+
   while (monday.isBefore(limit)) {
     const lessons = getLessonsForWeek(monday)
 
