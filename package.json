@@ -12,16 +12,16 @@
   "license": "ISC",
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
-    "dayjs": "^1.11.20",
-    "discord.js": "^14.26.0",
-    "dotenv": "^17.4.0",
+    "dayjs": "^1.11.23",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2",
     "formdata-node": "^6.0.3",
-    "got": "^15.0.0",
+    "got": "^16.0.0",
     "html-entities": "^2.6.0",
-    "node-html-parser": "^7.1.0",
+    "node-html-parser": "^9.0.4",
     "node-schedule": "^2.1.1",
-    "satori": "^0.26.0",
-    "tough-cookie": "^6.0.1",
-    "user-agents": "^2.1.19"
+    "satori": "^0.33.4",
+    "tough-cookie": "^6.0.2",
+    "user-agents": "^2.1.183"
   }
 }
