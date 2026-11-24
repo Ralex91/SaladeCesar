@@ -5,7 +5,8 @@
   "main": "bot.js",
   "type": "module",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "sign": "node scripts/sign.js"
   },
   "keywords": [],
   "author": "",

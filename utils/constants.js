@@ -9,17 +9,43 @@ export const CVEC_URLS = [
   `${config.baseUrl}/upload/cvec`,
 ]
 
-export const SELECTOR_COURSES = ".accordion-collapse .accordion-item"
-export const SELECTOR_COURSE_NAME = ".accordion-button .h5"
-export const SELECTOR_COURSE_GRADES = ".card"
-export const SELECTOR_GRADE = ".badge.text-bg-primary.fw-normal"
-export const SELECTOR_GRADE_TITLE = ".card-header .h6"
-export const SELECTOR_GRADE_COMMENT = ".card-text"
-export const SELECTOR_GRADE_ROW =
-  ".d-flex.justify-content-between span:not(.h6)"
-export const SELECTOR_GRADE_ROW_DATE = 0
-export const SELECTOR_GRADE_ROW_COEF = 1
-export const SELECTOR_GRADE_ROW_GROUP_AVG = 3
+export const GRADES = {
+  selectors: {
+    courses: ".accordion-collapse .accordion-item",
+    courseName: ".accordion-button .h5",
+    courseGrades: ".card",
+    locked: ".accordion-button svg",
+    grade: ".badge.text-bg-primary.fw-normal",
+    title: ".card-header .h6",
+    comment: ".card-text",
+    row: ".d-flex.justify-content-between span:not(.h6)",
+  },
+  rowIndex: {
+    date: 0,
+    coef: 1,
+    groupAverage: 3,
+  },
+}
+
+export const CALENDAR = {
+  selector: "[data-controller='tui-calendar']",
+  attrPrefix: "data-tui-calendar-",
+  attrs: {
+    schedules: "event-lesson-schedules",
+    student: "student-registration",
+    maxAttendance: "max-time-attendance",
+    serverTime: "time-server",
+  },
+}
+
+const SIGNATURE_COMPONENT = "Attendance:AttendanceStudentSignatureComponent"
+
+export const SIGNATURE = {
+  componentUrl: `${config.baseUrl}/_components/${SIGNATURE_COMPONENT}`,
+  selector: `[data-live-name-value="${SIGNATURE_COMPONENT}"]`,
+  propsAttr: "data-live-props-value",
+  file: "./signature.png",
+}
 
 export const TIMETABLE_DAYS = [
   "Lundi",
