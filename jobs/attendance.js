@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js"
 import { scheduleJob } from "node-schedule"
 import config from "../config.js"
-import { getLessonsOfDay } from "../libs/cesar/index.js"
+import { getLessonsOfDay } from "../libs/cesar/requests/calendar.js"
 import { formatDate } from "../utils/date.js"
 
 const attendanceCheck = async (client) => {

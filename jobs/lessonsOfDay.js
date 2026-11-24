@@ -8,7 +8,7 @@ import {
 } from "discord.js"
 import { scheduleJob } from "node-schedule"
 import config from "../config.js"
-import { getNextWeekWithLessons } from "../libs/cesar/index.js"
+import { getNextWeekWithLessons } from "../libs/cesar/requests/calendar.js"
 import { generateTimetable } from "../utils/timetable/generator.js"
 
 const buildContent = (weekResult) => {

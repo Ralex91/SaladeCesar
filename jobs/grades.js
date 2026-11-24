@@ -2,7 +2,7 @@ import { EmbedBuilder } from "discord.js"
 import fs from "fs"
 import { scheduleJob } from "node-schedule"
 import config from "../config.js"
-import { findNewGrades, getGrades } from "../libs/cesar/index.js"
+import { findNewGrades, getGrades } from "../libs/cesar/requests/grades.js"
 import { getHexRandomColor } from "../utils/color.js"
 
 const gradresCheck = async (client) => {
