@@ -5,24 +5,33 @@ import { parse } from "node-html-parser"
 import { CookieJar } from "tough-cookie"
 import config from "../../config.js"
 import { CVEC_URLS, LOGIN_URLS, SESSION } from "./constants.js"
-import { browserHeadersHook, refreshBrowserHeaders } from "./stealth.js"
+import {
+  browserHeadersHook,
+  orderHeadersHook,
+  refreshBrowserHeaders,
+  trackPageHook,
+} from "./stealth.js"
 
 export const cookieJar = new CookieJar()
-export const authClient = got.extend({
+
+export const clientOptions = {
   prefixUrl: config.baseUrl,
   cookieJar,
+  http2: true,
+  methodRewriting: true,
   retry: {
     limit: 0,
-  },
-  headers: {
-    Origin: config.baseUrl,
-  },
-  hooks: {
-    beforeRequest: [browserHeadersHook],
   },
   maxRedirects: 2,
   https: {
     rejectUnauthorized: false,
+  },
+}
+
+const authClient = got.extend(clientOptions, {
+  hooks: {
+    beforeRequest: [browserHeadersHook, orderHeadersHook],
+    afterResponse: [trackPageHook],
   },
 })
 

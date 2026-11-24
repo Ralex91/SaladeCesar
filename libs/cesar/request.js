@@ -1,13 +1,19 @@
+import got from "got"
 import { parse } from "node-html-parser"
 import {
-  authClient,
+  clientOptions,
   cookieJar,
   isLoginPage,
   renewSession,
   useSession,
 } from "./session.js"
+import {
+  browserHeadersHook,
+  orderHeadersHook,
+  trackPageHook,
+} from "./stealth.js"
 
-export const cesarClient = authClient.extend({
+export const cesarClient = got.extend(clientOptions, {
   hooks: {
     beforeRequest: [
       async (options) => {
@@ -16,8 +22,11 @@ export const cesarClient = authClient.extend({
           options.url.toString(),
         )
       },
+      browserHeadersHook,
+      orderHeadersHook,
     ],
     afterResponse: [
+      trackPageHook,
       async (response, retryWithMergedOptions) => {
         if (!isLoginPage(response.url)) {
           return response

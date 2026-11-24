@@ -182,6 +182,7 @@ const postSignatureComponent = async ({ page, action, data }) => {
       "X-Live-Url": `/${page}`,
       Referer: `${config.baseUrl}/${page}`,
     },
+    context: { mode: "cors" },
     body: form,
   })
 

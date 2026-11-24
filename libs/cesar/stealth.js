@@ -52,11 +52,69 @@ const getStableChromeMilestone = async (fallback) => {
 }
 
 let milestone = await getStableChromeMilestone(CHROME.fallbackMilestone)
+let lastPageUrl = null
 
 export const refreshBrowserHeaders = async () => {
   milestone = await getStableChromeMilestone(milestone)
 }
 
+const requestMode = (options) => options.context?.mode ?? "navigate"
+
 export const browserHeadersHook = (options) => {
-  Object.assign(options.headers, chromeHeaders(milestone))
+  const { headers } = options
+  const mode = requestMode(options)
+  const method = options.method.toUpperCase()
+
+  if (mode === "navigate" && !headers.referer && lastPageUrl) {
+    headers.referer = lastPageUrl
+  }
+
+  Object.assign(
+    headers,
+    chromeHeaders(milestone),
+    CHROME.headers.common,
+    CHROME.headers[mode],
+  )
+
+  headers["sec-fetch-site"] = headers.referer ? "same-origin" : "none"
+
+  if (method === "GET" || method === "HEAD") {
+    delete headers.origin
+  } else {
+    headers.origin = new URL(options.url).origin
+  }
+
+  if (mode === "navigate" && method === "POST") {
+    headers["cache-control"] = "max-age=0"
+  } else {
+    delete headers["cache-control"]
+  }
+}
+
+export const orderHeadersHook = (options) => {
+  const { headers } = options
+  const order = CHROME.headerOrder[requestMode(options)]
+  const rank = (name) => {
+    const index = order.indexOf(name)
+
+    return index === -1 ? order.length : index
+  }
+
+  const ordered = Object.entries(headers).sort(([a], [b]) => rank(a) - rank(b))
+
+  for (const [name] of ordered) {
+    delete headers[name]
+  }
+
+  for (const [name, value] of ordered) {
+    headers[name] = value
+  }
+}
+
+export const trackPageHook = (response) => {
+  if (requestMode(response.request.options) === "navigate") {
+    lastPageUrl = response.url
+  }
+
+  return response
 }
