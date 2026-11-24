@@ -1,14 +1,19 @@
 import { EmbedBuilder } from "discord.js"
 import fs from "fs"
-import { scheduleJob } from "node-schedule"
 import config from "../config.js"
 import { findNewGrades, getGrades } from "../libs/cesar/requests/grades.js"
 import { getHexRandomColor } from "../utils/color.js"
+import { scheduleRandomInterval } from "../utils/schedule.js"
+
+const CHECK_INTERVAL = { min: 45 * 60_000, max: 90 * 60_000 }
+const ACTIVE_FROM_HOUR = 7
 
 const gradresCheck = async (client) => {
   client.on("clientReady", async () => {
-    scheduleJob("0 * * * *", () => task())
     task()
+    scheduleRandomInterval(CHECK_INTERVAL.min, CHECK_INTERVAL.max, task, {
+      isActive: (now) => now.getHours() >= ACTIVE_FROM_HOUR,
+    })
   })
 
   const task = async () => {

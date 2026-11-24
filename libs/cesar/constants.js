@@ -45,6 +45,11 @@ export const SIGNATURE = {
   selector: `[data-live-name-value="${SIGNATURE_COMPONENT}"]`,
   propsAttr: "data-live-props-value",
   file: "./signature.json",
+  pauses: {
+    draw: { min: 2_000, max: 5_000 },
+    submit: { min: 1_000, max: 2_000 },
+    minSecondsLeft: 60,
+  },
 }
 
 export const SESSION = {

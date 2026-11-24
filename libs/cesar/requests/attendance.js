@@ -1,6 +1,7 @@
 import fs from "fs"
 import { parse } from "node-html-parser"
 import config from "../../../config.js"
+import { random, sleep } from "../../../utils/schedule.js"
 import { generateSignatureDataUrl } from "../../../utils/signature.js"
 import { cesarClient, fetchPage } from "../client.js"
 import { CALENDAR, SIGNATURE } from "../constants.js"
@@ -120,6 +121,17 @@ export const signAttendance = async () => {
     throw Error("Cesar: attendance already signed")
   }
 
+  const startedAt = Date.now()
+  const humanPause = async ({ min, max }) => {
+    const elapsed = (Date.now() - startedAt) / 1000
+
+    if (lesson.secondsLeft - elapsed > SIGNATURE.pauses.minSecondsLeft) {
+      await sleep(random(min, max))
+    }
+  }
+
+  await humanPause(SIGNATURE.pauses.draw)
+
   const updated = await postSignatureComponent({
     page,
     data: {
@@ -127,6 +139,8 @@ export const signAttendance = async () => {
       updated: { "signature.data": createSignatureImage() },
     },
   })
+
+  await humanPause(SIGNATURE.pauses.submit)
 
   const signed = await postSignatureComponent({
     page,

@@ -6,10 +6,12 @@ import {
   MessageFlags,
   TextDisplayBuilder,
 } from "discord.js"
-import { scheduleJob } from "node-schedule"
 import config from "../config.js"
 import { getNextWeekWithLessons } from "../libs/cesar/requests/calendar.js"
+import { scheduleWithJitter } from "../utils/schedule.js"
 import { generateTimetable } from "../utils/timetable/generator.js"
+
+const SEND_JITTER = 20 * 60_000
 
 const buildContent = (weekResult) => {
   const now = dayjs()
@@ -36,7 +38,7 @@ const lessonsOfDay = async (client) => {
 
     task(message)
 
-    scheduleJob("0 17 * * *", () => task(message))
+    scheduleWithJitter("0 17 * * *", SEND_JITTER, () => task(message))
   })
 
   const task = async (message) => {
