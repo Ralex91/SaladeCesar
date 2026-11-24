@@ -14,15 +14,15 @@
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
     "dayjs": "^1.11.23",
-    "discord.js": "^14.27.0",
-    "dotenv": "^17.4.2",
+    "discord.js": "^14.28.1",
+    "dotenv": "^18.0.10",
     "formdata-node": "^6.0.3",
-    "got": "^16.0.0",
+    "got": "^16.2.0",
     "html-entities": "^2.6.0",
-    "node-html-parser": "^9.0.4",
-    "node-schedule": "^2.1.1",
-    "satori": "^0.33.4",
-    "tough-cookie": "^6.0.2",
-    "user-agents": "^2.1.183"
+    "node-html-parser": "^9.0.7",
+    "node-schedule": "^2.1.2",
+    "satori": "^0.63.2",
+    "tough-cookie": "^6.1.0",
+    "user-agents": "^2.1.253"
   }
 }
