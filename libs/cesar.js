@@ -6,6 +6,7 @@ import { parse } from "node-html-parser"
 import config from "../config.js"
 import { CALENDAR, GRADES, SIGNATURE } from "../utils/constants.js"
 import { useSession } from "../utils/session.js"
+import { generateSignatureDataUrl } from "../utils/signature.js"
 
 const requestOptions = async (headers = {}) => ({
   headers: {
@@ -174,14 +175,20 @@ const readSignatureProps = (root) => {
 
 const isSignatureSaved = (props) => typeof props?.signature === "string"
 
-const readSignatureImage = () => {
+const createSignatureImage = () => {
   if (!fs.existsSync(SIGNATURE.file)) {
-    throw Error(`Signature file ${SIGNATURE.file} not found (300x150 PNG)`)
+    throw Error(
+      `Signature file ${SIGNATURE.file} not found (create it with html/sign-capture.html)`,
+    )
   }
 
-  const base64 = fs.readFileSync(SIGNATURE.file).toString("base64")
+  const samples = JSON.parse(fs.readFileSync(SIGNATURE.file, "utf8"))
 
-  return `data:image/png;base64,${base64}`
+  if (!Array.isArray(samples) || samples.length === 0) {
+    throw Error(`Signature file ${SIGNATURE.file} contains no signature`)
+  }
+
+  return generateSignatureDataUrl(samples)
 }
 
 const postSignatureComponent = async (action, data) => {
@@ -274,7 +281,7 @@ export const signAttendance = async () => {
 
   const updated = await postSignatureComponent(null, {
     props,
-    updated: { "signature.data": readSignatureImage() },
+    updated: { "signature.data": createSignatureImage() },
   })
 
   const signed = await postSignatureComponent("signed", {
