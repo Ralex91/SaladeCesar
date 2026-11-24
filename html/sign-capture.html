@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Capture de signature</title>
+    <style>
+      :root {
+        --bg: #313338;
+        --panel: #2b2d31;
+        --panel-2: #232428;
+        --border: #3a3c41;
+        --text: #dbdee1;
+        --muted: #949ba4;
+        --accent: #5865f2;
+        --accent-hover: #4752c4;
+        --success: #23a55a;
+        --danger: #f23f43;
+        --paper: #ffffff;
+        --ink: #000000;
+        --guide: #c9ccd1;
+        --radius: 8px;
+        --font: "gg sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+        padding: 32px 16px;
+      }
+      .app {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 24px;
+        align-items: start;
+      }
+      header {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: #fff;
+      }
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .progress-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .progress-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--border);
+        transition: background 0.2s;
+      }
+      .progress-dots span.done {
+        background: var(--success);
+      }
+
+      .card {
+        background: var(--panel);
+        border-radius: var(--radius);
+        padding: 16px;
+      }
+
+      .pad-wrap {
+        position: relative;
+        background: var(--paper);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .pad-size {
+        position: absolute;
+        right: 10px;
+        bottom: 8px;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        color: var(--guide);
+        pointer-events: none;
+      }
+      .pad-empty {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: var(--guide);
+        font-size: 18px;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      #pad {
+        position: relative;
+        display: block;
+        width: 100%;
+        aspect-ratio: 2 / 1;
+        touch-action: none;
+        cursor: crosshair;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .toolbar-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 4px;
+        padding: 8px 14px;
+        font: inherit;
+        font-weight: 500;
+        color: #fff;
+        background: #4e5058;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      button:hover:not(:disabled) {
+        background: #6d6f78;
+      }
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      button.primary {
+        background: var(--accent);
+      }
+      button.primary:hover:not(:disabled) {
+        background: var(--accent-hover);
+      }
+      button.success {
+        background: var(--success);
+      }
+      button.success:hover:not(:disabled) {
+        background: #1a8a4a;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      kbd {
+        font: inherit;
+        font-size: 11px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.25);
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      aside {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+      .real-size {
+        display: block;
+        width: 300px;
+        max-width: 100%;
+        aspect-ratio: 2 / 1;
+        background: var(--paper);
+        border-radius: 4px;
+      }
+      .hint {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .slots {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .slot {
+        position: relative;
+        aspect-ratio: 2 / 1;
+        border-radius: 4px;
+      }
+      .slot.empty {
+        border: 2px dashed #4e5058;
+        display: grid;
+        place-items: center;
+        color: #6d6f78;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .slot canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: var(--paper);
+        border-radius: 4px;
+      }
+      .slot .remove {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--danger);
+        font-size: 14px;
+        line-height: 1;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .slot:hover .remove,
+      .slot .remove:focus-visible {
+        opacity: 1;
+      }
+      .export {
+        width: 100%;
+        justify-content: center;
+        margin-top: 12px;
+        padding: 10px 14px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translate(-50%, 20px);
+        background: var(--panel-2);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      @media (max-width: 860px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .slots {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <h1>Ta signature</h1>
+        <div class="progress">
+          <div class="progress-dots" id="progress-dots"></div>
+          <span id="progress-label"></span>
+        </div>
+      </header>
+
+      <main class="card">
+        <div class="pad-wrap">
+          <div class="pad-empty" id="pad-empty">Signe ici</div>
+          <div class="pad-size">300 × 150</div>
+          <canvas id="pad"></canvas>
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <button id="undo">Annuler le trait <kbd>Ctrl Z</kbd></button>
+            <button id="clear">Effacer <kbd>Échap</kbd></button>
+          </div>
+          <button id="save" class="primary">
+            Valider la signature <kbd>Entrée</kbd>
+          </button>
+        </div>
+      </main>
+
+      <aside>
+        <section class="card">
+          <h2 class="section-title">Taille réelle</h2>
+          <canvas id="preview" class="real-size"></canvas>
+          <p class="hint">C'est la taille de l'image envoyée.</p>
+        </section>
+
+        <section class="card">
+          <h2 class="section-title">Signatures validées</h2>
+          <div class="slots" id="slots"></div>
+          <button id="export" class="success export">
+            Exporter signature.json
+          </button>
+          <p class="hint">À placer à la racine du projet.</p>
+        </section>
+      </aside>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+      const W = 300
+      const H = 150
+      const MIN_DISTANCE = 1.5
+      const THROTTLE = 16
+      const TARGET = 5
+      const PEN = {
+        minWidth: 0.5,
+        maxWidth: 2.5,
+        velocityFilterWeight: 0.7,
+        velocityScale: 3,
+      }
+
+      // Stroke rendering adapted from signature_pad (https://github.com/szimek/signature_pad)
+
+      const distance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y)
+
+      const velocity = (from, to) =>
+        to.time !== from.time ? distance(from, to) / (to.time - from.time) : 0
+
+      const controlPoints = (s1, s2, s3) => {
+        const m1 = { x: (s1.x + s2.x) / 2, y: (s1.y + s2.y) / 2 }
+        const m2 = { x: (s2.x + s3.x) / 2, y: (s2.y + s3.y) / 2 }
+        const l1 = distance(s1, s2)
+        const l2 = distance(s2, s3)
+        const k = l1 + l2 === 0 ? 0 : l2 / (l1 + l2)
+        const cm = { x: m2.x + (m1.x - m2.x) * k, y: m2.y + (m1.y - m2.y) * k }
+        const tx = s2.x - cm.x
+        const ty = s2.y - cm.y
+
+        return {
+          c1: { x: m1.x + tx, y: m1.y + ty },
+          c2: { x: m2.x + tx, y: m2.y + ty },
+        }
+      }
+
+      const bezierPoint = (t, p0, p1, p2, p3) => {
+        const u = 1 - t
+
+        return {
+          x: u * u * u * p0.x + 3 * u * u * t * p1.x + 3 * u * t * t * p2.x + t * t * t * p3.x,
+          y: u * u * u * p0.y + 3 * u * u * t * p1.y + 3 * u * t * t * p2.y + t * t * t * p3.y,
+        }
+      }
+
+      const bezierLength = (p0, p1, p2, p3) => {
+        let length = 0
+        let previous = p0
+
+        for (let i = 1; i <= 10; i++) {
+          const point = bezierPoint(i / 10, p0, p1, p2, p3)
+          length += distance(previous, point)
+          previous = point
+        }
+
+        return length
+      }
+
+      const strokeDots = (stroke, { minWidth, maxWidth, velocityFilterWeight, velocityScale }) => {
+        const points = stroke.map(([x, y, time]) => ({ x, y, time }))
+
+        if (points.length === 1) {
+          return [{ ...points[0], r: (minWidth + maxWidth) / 2 }]
+        }
+
+        const dots = []
+        const buffer = []
+        let lastVelocity = 0
+        let lastWidth = (minWidth + maxWidth) / 2
+
+        for (const point of [...points, points[points.length - 1]]) {
+          buffer.push(point)
+          if (buffer.length < 3) continue
+          if (buffer.length === 3) buffer.unshift(buffer[0])
+
+          const [s1, s2, s3, s4] = buffer
+          const v =
+            velocityFilterWeight * velocity(s2, s3) * velocityScale +
+            (1 - velocityFilterWeight) * lastVelocity
+          const width = Math.max(maxWidth / (v + 1), minWidth)
+          const c2 = controlPoints(s1, s2, s3).c2
+          const c3 = controlPoints(s2, s3, s4).c1
+          const steps = Math.max(1, Math.ceil(bezierLength(s2, c2, c3, s3) * 4))
+
+          for (let i = 0; i < steps; i++) {
+            const t = i / steps
+            dots.push({
+              ...bezierPoint(t, s2, c2, c3, s3),
+              r: Math.min(lastWidth + t * t * t * (width - lastWidth), maxWidth),
+            })
+          }
+
+          lastVelocity = v
+          lastWidth = width
+          buffer.shift()
+        }
+
+        return dots
+      }
+
+      const setupCanvas = (canvas) => {
+        const ratio = (canvas.clientWidth / W) * (window.devicePixelRatio || 1)
+        canvas.width = Math.round(W * ratio)
+        canvas.height = Math.round(H * ratio)
+        const context = canvas.getContext("2d")
+        context.setTransform(ratio, 0, 0, ratio, 0, 0)
+
+        return context
+      }
+
+      const drawStrokes = (context, strokes) => {
+        context.clearRect(0, 0, W, H)
+        context.fillStyle = "#000"
+        context.beginPath()
+
+        for (const stroke of strokes) {
+          for (const { x, y, r } of strokeDots(stroke, PEN)) {
+            context.moveTo(x + r, y)
+            context.arc(x, y, r, 0, Math.PI * 2)
+          }
+        }
+
+        context.fill()
+      }
+
+      const $ = (id) => document.getElementById(id)
+      const pad = $("pad")
+      const preview = $("preview")
+      let padCtx = setupCanvas(pad)
+      let previewCtx = setupCanvas(preview)
+
+      let strokes = []
+      let current = null
+      let strokeStart = 0
+      const samples = []
+
+      const allStrokes = () => (current ? [...strokes, current] : strokes)
+
+      const redraw = () => {
+        const list = allStrokes()
+        drawStrokes(padCtx, list)
+        drawStrokes(previewCtx, list)
+        $("pad-empty").style.opacity = list.length ? 0 : 1
+        $("save").disabled = strokes.length === 0
+        $("undo").disabled = strokes.length === 0
+        $("clear").disabled = strokes.length === 0
+      }
+
+      let toastTimer
+      const toast = (message) => {
+        const el = $("toast")
+        el.textContent = message
+        el.classList.add("show")
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => el.classList.remove("show"), 1800)
+      }
+
+      const renderSamples = () => {
+        const slots = $("slots")
+        slots.innerHTML = ""
+
+        for (let i = 0; i < Math.max(TARGET, samples.length); i++) {
+          const slot = document.createElement("div")
+          slot.className = "slot"
+          slots.appendChild(slot)
+
+          if (!samples[i]) {
+            slot.classList.add("empty")
+            slot.textContent = i + 1
+            continue
+          }
+
+          const thumb = document.createElement("canvas")
+          slot.appendChild(thumb)
+          drawStrokes(setupCanvas(thumb), samples[i])
+
+          const remove = document.createElement("button")
+          remove.className = "remove"
+          remove.textContent = "×"
+          remove.title = "Supprimer"
+          remove.setAttribute("aria-label", `Supprimer la signature ${i + 1}`)
+          remove.addEventListener("click", () => {
+            samples.splice(i, 1)
+            renderSamples()
+            toast("Signature supprimée")
+          })
+          slot.appendChild(remove)
+        }
+
+        $("progress-dots").innerHTML = Array.from(
+          { length: TARGET },
+          (_, i) => `<span class="${i < samples.length ? "done" : ""}"></span>`,
+        ).join("")
+        $("progress-label").textContent = `${samples.length} / ${TARGET}`
+        $("export").disabled = samples.length === 0
+      }
+
+      const toPoint = (e) => {
+        const rect = pad.getBoundingClientRect()
+
+        return [
+          Math.round(((e.clientX - rect.left) / rect.width) * W * 10) / 10,
+          Math.round(((e.clientY - rect.top) / rect.height) * H * 10) / 10,
+          Math.round(e.timeStamp - strokeStart),
+        ]
+      }
+
+      pad.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0) return
+        pad.setPointerCapture(e.pointerId)
+        strokeStart = e.timeStamp
+        current = [toPoint(e)]
+        redraw()
+      })
+
+      pad.addEventListener("pointermove", (e) => {
+        if (!current) return
+        const point = toPoint(e)
+        const last = current[current.length - 1]
+
+        if (point[2] - last[2] < THROTTLE) return
+        if (Math.hypot(point[0] - last[0], point[1] - last[1]) <= MIN_DISTANCE) return
+
+        current.push(point)
+        redraw()
+      })
+
+      const endStroke = () => {
+        if (!current) return
+        strokes.push(current)
+        current = null
+        redraw()
+      }
+
+      pad.addEventListener("pointerup", endStroke)
+      pad.addEventListener("pointercancel", endStroke)
+
+      const undo = () => {
+        strokes.pop()
+        redraw()
+      }
+
+      const clear = () => {
+        strokes = []
+        redraw()
+      }
+
+      const save = () => {
+        if (strokes.length === 0) return
+        samples.push(strokes)
+        strokes = []
+        redraw()
+        renderSamples()
+        toast(`Signature ${samples.length} validée`)
+      }
+
+      const exportJson = () => {
+        if (samples.length === 0) return
+        const blob = new Blob([JSON.stringify(samples)], { type: "application/json" })
+        const link = document.createElement("a")
+        link.href = URL.createObjectURL(blob)
+        link.download = "signature.json"
+        link.click()
+        URL.revokeObjectURL(link.href)
+        toast(`signature.json exporté (${samples.length} signature(s))`)
+      }
+
+      $("undo").addEventListener("click", undo)
+      $("clear").addEventListener("click", clear)
+      $("save").addEventListener("click", save)
+      $("export").addEventListener("click", exportJson)
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault()
+          save()
+        } else if (e.key === "Escape") {
+          clear()
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+          e.preventDefault()
+          undo()
+        }
+      })
+
+      window.addEventListener("resize", () => {
+        padCtx = setupCanvas(pad)
+        previewCtx = setupCanvas(preview)
+        redraw()
+        renderSamples()
+      })
+
+      redraw()
+      renderSamples()
+    </script>
+  </body>
+</html>

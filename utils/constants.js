@@ -44,7 +44,7 @@ export const SIGNATURE = {
   componentUrl: `${config.baseUrl}/_components/${SIGNATURE_COMPONENT}`,
   selector: `[data-live-name-value="${SIGNATURE_COMPONENT}"]`,
   propsAttr: "data-live-props-value",
-  file: "./signature.png",
+  file: "./signature.json",
 }
 
 export const TIMETABLE_DAYS = [
