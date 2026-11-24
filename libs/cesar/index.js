@@ -1,35 +1,11 @@
 import dayjs from "dayjs"
 import fs from "fs"
-import got from "got"
 import { decode } from "html-entities"
 import { parse } from "node-html-parser"
-import config from "../config.js"
-import { CALENDAR, GRADES, SIGNATURE } from "../utils/constants.js"
-import { useSession } from "../utils/session.js"
-import { generateSignatureDataUrl } from "../utils/signature.js"
-
-const requestOptions = async (headers = {}) => ({
-  headers: {
-    Cookie: `PHPSESSID=${await useSession()}`,
-    ...headers,
-  },
-  https: {
-    rejectUnauthorized: false,
-  },
-})
-
-const bodyParser = async (path) => {
-  const res = await got.get(
-    `${config.baseUrl}${path ?? ""}`,
-    await requestOptions(),
-  )
-
-  if (!res.ok) {
-    throw Error(`Cesar error: ${res.statusCode} : ${res.statusMessage}`)
-  }
-
-  return parse(res.body)
-}
+import config from "../../config.js"
+import { generateSignatureDataUrl } from "../../utils/signature.js"
+import { CALENDAR, GRADES, SIGNATURE } from "./constants.js"
+import { cesarClient, fetchPage } from "./request.js"
 
 const extractText = (element) => {
   if (!element || !element.innerText) {
@@ -45,12 +21,12 @@ const readCalendarAttr = (root, name) =>
     ?.getAttribute(`${CALENDAR.attrPrefix}${name}-value`)
 
 const calandarJson = async (path) => {
-  const root = await bodyParser(path)
+  const root = await fetchPage(path)
 
   return JSON.parse(readCalendarAttr(root, CALENDAR.attrs.schedules))
 }
 
-export const getCalandar = async () => await calandarJson("/emploi-du-temps")
+export const getCalandar = async () => await calandarJson("emploi-du-temps")
 
 export const getLessonsOfDay = async () => {
   const dayCalendar = await calandarJson()
@@ -121,7 +97,7 @@ const parseGrade = (grade) => {
 }
 
 export const getGrades = async () => {
-  const body = await bodyParser("/mes-notes")
+  const body = await fetchPage("mes-notes")
 
   return body
     .querySelectorAll(GRADES.selectors.courses)
@@ -191,22 +167,22 @@ const createSignatureImage = () => {
   return generateSignatureDataUrl(samples)
 }
 
-const postSignatureComponent = async (action, data) => {
+const postSignatureComponent = async ({ page, action, data }) => {
   const form = new FormData()
   form.set("data", JSON.stringify(data))
 
-  const url = action
-    ? `${SIGNATURE.componentUrl}/${action}`
-    : SIGNATURE.componentUrl
+  const path = action
+    ? `${SIGNATURE.componentPath}/${action}`
+    : SIGNATURE.componentPath
 
-  const { body } = await got.post(url, {
-    ...(await requestOptions({
+  const { body } = await cesarClient.post(path, {
+    headers: {
       Accept: "application/vnd.live-component+html",
       "X-Requested-With": "XMLHttpRequest",
-      "X-Live-Url": "/",
-    })),
+      "X-Live-Url": `/${page}`,
+      Referer: `${config.baseUrl}/${page}`,
+    },
     body: form,
-    retry: { limit: 0 },
   })
 
   return readSignatureProps(parse(body))
@@ -236,7 +212,7 @@ const toSignatureLine = (lesson, { studentId, maxMs, serverNow }) => {
 
 export const getSignatureLines = async () => {
   const fetchedAt = Date.now()
-  const root = await bodyParser()
+  const root = await fetchPage()
   const attr = (name) => readCalendarAttr(root, name)
 
   const schedules = attr(CALENDAR.attrs.schedules)
@@ -267,9 +243,8 @@ export const signAttendance = async () => {
     throw Error("Cesar: no open signature window")
   }
 
-  const props = readSignatureProps(
-    await bodyParser(`/mes-cours/${lesson.lessonId}/emargement`),
-  )
+  const page = `mes-cours/${lesson.lessonId}/emargement`
+  const props = readSignatureProps(await fetchPage(page))
 
   if (!props) {
     throw Error("Cesar: signature component not found")
@@ -279,15 +254,18 @@ export const signAttendance = async () => {
     throw Error("Cesar: attendance already signed")
   }
 
-  const updated = await postSignatureComponent(null, {
-    props,
-    updated: { "signature.data": createSignatureImage() },
+  const updated = await postSignatureComponent({
+    page,
+    data: {
+      props,
+      updated: { "signature.data": createSignatureImage() },
+    },
   })
 
-  const signed = await postSignatureComponent("signed", {
-    props: updated,
-    updated: {},
-    args: {},
+  const signed = await postSignatureComponent({
+    page,
+    action: "signed",
+    data: { props: updated, updated: {}, args: {} },
   })
 
   if (!isSignatureSaved(signed)) {

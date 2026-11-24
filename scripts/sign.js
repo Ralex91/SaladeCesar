@@ -1,5 +1,5 @@
 import "dotenv/config"
-import { signAttendance } from "../libs/cesar.js"
+import { signAttendance } from "../libs/cesar/index.js"
 
 try {
   await signAttendance()

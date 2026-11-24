@@ -1,7 +1,7 @@
 import { Client, Collection, GatewayIntentBits } from "discord.js"
 import "dotenv/config"
 import fs from "fs"
-import { useSession } from "./utils/session.js"
+import { useSession } from "./libs/cesar/session.js"
 
 const client = new Client({
   intents: [
