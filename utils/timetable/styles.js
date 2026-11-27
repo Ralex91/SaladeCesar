@@ -79,7 +79,7 @@ export const styles = {
     fontWeight: 700,
     fontSize: TIMETABLE_THEME.fontSize.subject,
     marginBottom: 3,
-    wordBreak: "break-all",
+    wordBreak: "break-word",
     overflow: "hidden",
     display: "-webkit-box",
     WebkitBoxOrient: "vertical",

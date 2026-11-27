@@ -10,6 +10,10 @@ import {
 } from "../constants.js"
 import { styles } from "./styles.js"
 
+const SUBJECT_CODE_REGEX = /^[A-Z](?:\d{2}|[A-Z])\s+/
+
+const stripSubjectCode = (name) => name.trim().replace(SUBJECT_CODE_REGEX, "")
+
 export const generateTimetable = async (lessons, monday) => {
   const getColor = createUniqueColorMap(TIMETABLE_THEME.subjectColors)
 
@@ -36,6 +40,7 @@ export const generateTimetable = async (lessons, monday) => {
 
   const lessonCard = (lesson) => {
     const color = getColor(lesson.schoolSubject.name)
+    const title = stripSubjectCode(lesson.schoolSubject.name)
     const start = dayjs(lesson.startDate).format("HH:mm")
     const end = dayjs(lesson.endDate).format("HH:mm")
     const room = lesson.remote
@@ -59,7 +64,7 @@ export const generateTimetable = async (lessons, monday) => {
                   type: "span",
                   props: {
                     style: styles.subject(color),
-                    children: lesson.schoolSubject.name,
+                    children: title,
                   },
                 },
                 {
